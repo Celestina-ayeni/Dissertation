@@ -1,0 +1,156 @@
+---
+title: "Diabetes Prediction"
+author: "Funmilayo Ayeni"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: row
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(mlbench)
+library(caret)
+library(factoextra)
+library(caTools)
+library(party)
+library(dplyr)
+library(magrittr)
+library(flexdashboard)
+
+dt = read.csv("/Users/hp/Dropbox/My PC (Celestina)/Downloads/diabetic_data.csv")
+
+factor(dt)
+```
+
+Data cleaning
+======================================================================
+
+row {data-width=650}
+-----------------------------------------------------------------------
+
+### Data replacing 
+
+```{r}
+dt$weight <- as.character(dt$weight)
+dt$weight[dt$weight == "?"] <- "0"
+
+dt$race <- as.character(dt$race)
+dt$race[dt$race == "?"] <- "0"
+
+dt$payer_code <-as.character(dt$payer_code)
+dt$payer_code[dt$payer_code == "?"] <- "0"
+
+dt$medical_specialty <- as.character(dt$medical_specialty)
+dt$medical_specialty[dt$medical_specialty == "?"] <- "0"
+
+
+print(dt)
+
+
+  
+
+
+
+
+```
+
+row {data-width=350}
+-----------------------------------------------------------------------
+
+### defining statistic of dataset
+
+```{r}
+
+prop_dt <- table(dt$diabetesMed)
+props_data <- prop.table(prop_dt) * 100
+prop.table(prop_dt)
+summary(dt)
+
+```
+
+
+Feature Selection
+======================================================================
+
+### Correlation
+row {data-width=350}
+----------------------------------------------------------------------
+
+```{r}
+corMatrix <- cor(dt[,1:50])
+print(corMatrix)
+highcorrelated <- findCorrelation(corMatrix, cutoff = 0.5)
+print()
+
+control <- rfeControl(functions=rfFuncs, method="cv", number=10)
+results <- rfe(df[,1:50], PimaIndiansDiabetes[,51], sizes=c(1:50), rfeControl=control)
+print(results)
+predictors(results)
+plot(results, type = ("g"))
+
+```
+
+### Rank of Importance 
+
+```{r}
+
+control <- trainControl(method="repeatedcv", number=10, repeats=3)
+model <- train(diabetesMed~., data=dt, method="lvq", preProcess="scale", trControl=control)
+importance <- varImp(model, scale=FALSE)
+print(importance)
+plot(importance)
+```
+
+
+
+Clustering
+======================================================================
+
+row {data-width=650}
+-----------------------------------------------------------------------
+
+### Simple Kmeans
+
+```{r}
+
+  #kmeans(df, k)
+```
+
+row {data-width=350}
+-----------------------------------------------------------------------
+
+### hierachical clustering
+
+```{r}
+
+```
+
+
+Prediction
+======================================================================
+
+row {data-width=650}
+-----------------------------------------------------------------------
+
+### chart G
+
+```{r}
+
+```
+
+row {data-width=350}
+-----------------------------------------------------------------------
+
+### chart H
+
+```{r}
+
+```
+
+### chart I
+
+```{r}
+
+```
+
+
